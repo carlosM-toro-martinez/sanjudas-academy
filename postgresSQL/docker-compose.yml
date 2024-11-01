@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgresSanJudasTadeo
+    environment:
+      POSTGRES_USER: sanjudas
+      # POSTGRES_PASSWORD: sanjudasPassword.ps
+      POSTGRES_PASSWORD: sanjudas.ps
+      POSTGRES_DB: san_judas_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data_sanjudas:/var/lib/postgresql/data
+
+volumes:
+  postgres_data_sanjudas:
