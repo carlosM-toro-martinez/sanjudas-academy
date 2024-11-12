@@ -74,6 +74,11 @@ class servicesDetalleCompra {
 
   async createDetalleCompra(data) {
     try {
+      if (!data.id_producto) {
+        throw new Error(
+          "El campo 'id_producto' es obligatorio y debe ser un número válido."
+        );
+      }
       const newDetalleCompra = await DetalleCompra.create(data);
       return newDetalleCompra;
     } catch (error) {

@@ -43,6 +43,19 @@ route.post("/registrar-venta", async (req, res) => {
   }
 });
 
+route.post("/movimiento-inventario", async (req, res) => {
+  try {
+    const ventaDetalles = req.body;
+
+    const resultado = await ventaService.procesarInventario(ventaDetalles);
+
+    res.status(201).json(resultado);
+  } catch (error) {
+    console.error("Error procesando venta:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 route.post("/procesar-venta", async (req, res) => {
   try {
     const ventaDetalles = req.body;

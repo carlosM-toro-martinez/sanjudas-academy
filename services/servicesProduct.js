@@ -62,6 +62,8 @@ class servicesProducto {
 
   async updateProduct(id, data) {
     const transaction = await sequelize.transaction();
+    console.log(data);
+    console.log(id);
 
     try {
       const product = await Producto.findByPk(id, { transaction });
@@ -94,16 +96,16 @@ class servicesProducto {
       );
 
       // Crear registro en MovimientoInventario
-      await movimientoInventarioService.createMovimientoInventario(
-        {
-          id_producto: id,
-          cantidad: data.cantidad,
-          tipo_movimiento: data.tipo_movimiento,
-          fecha_movimiento: new Date(),
-          id_trabajador: data.id_trabajador,
-        },
-        transaction
-      );
+      // await movimientoInventarioService.createMovimientoInventario(
+      //   {
+      //     id_producto: id,
+      //     cantidad: data.cantidad,
+      //     tipo_movimiento: data.tipo_movimiento,
+      //     fecha_movimiento: new Date(),
+      //     id_trabajador: data.id_trabajador,
+      //   },
+      //   transaction
+      // );
 
       // Crear registro en Inventario
       await inventarioService.createInventario(
@@ -112,7 +114,7 @@ class servicesProducto {
           id_lote: data.id_lote,
           cantidad: data.cantidad,
           subCantidad: data?.subCantidad,
-          peso: parseFloat((currentPeso + pesoChange).toFixed(2)),
+          peso: parseFloat(data.peso).toFixed(2),
           fecha_actualizacion: new Date(),
           id_trabajador: data.id_trabajador,
         },

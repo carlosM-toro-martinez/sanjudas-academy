@@ -23,6 +23,8 @@ MovimientoInventario.init(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+
+    subCantidad: DataTypes.INTEGER,
     fecha_movimiento: {
       type: DataTypes.DATE,
       allowNull: false,

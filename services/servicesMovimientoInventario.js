@@ -1,3 +1,4 @@
+const { Producto, Trabajador } = require("../models");
 const MovimientoInventario = require("../models/MovimientoInventario");
 
 class servicesMovimientoInventario {
@@ -8,7 +9,18 @@ class servicesMovimientoInventario {
   // Método GET para obtener todos los movimientos de inventario
   async getAllMovimientosInventario() {
     try {
-      const movimientos = await MovimientoInventario.findAll();
+      const movimientos = await MovimientoInventario.findAll({
+        include: [
+          {
+            model: Producto,
+            as: "producto",
+          },
+          {
+            model: Trabajador,
+            as: "trabajadorMovimientoInventario",
+          },
+        ],
+      });
       return movimientos;
     } catch (error) {
       console.error("Error fetching all movimientosInventario:", error);
