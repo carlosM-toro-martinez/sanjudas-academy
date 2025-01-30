@@ -27,7 +27,11 @@ const Docente = require("./Docente");
 const Materia = require("./Materia");
 const HorarioMateria = require("./HorarioMateria");
 const EstudianteHorarioMateria = require("./EstudianteHorarioMateria");
-
+const Carrera = require("./Carrera");
+const MateriaCarrera = require("./MateriaCarrera");
+const Ambiente = require("./Ambiente");
+const EstudianteCarrera = require("./EstudianteCarrera");
+const InscripcionMateria = require("./InscripcionMateria");
 // // Definir las relaciones
 // Estudiante.hasMany(EstudianteHorarioMateria, {
 //   foreignKey: "id_estudiante",
@@ -50,6 +54,47 @@ const EstudianteHorarioMateria = require("./EstudianteHorarioMateria");
 //   foreignKey: "id_horario",
 //   as: "horario", // Alias único para la relación inversa
 // });
+
+Carrera.hasMany(MateriaCarrera, {
+  foreignKey: "id_carrera",
+  as: "materiasCarrera",
+});
+MateriaCarrera.belongsTo(Carrera, { foreignKey: "id_carrera", as: "carrera" });
+
+EstudianteCarrera.belongsTo(Carrera, {
+  foreignKey: "id_carrera",
+  as: "carrera",
+});
+Carrera.hasMany(EstudianteCarrera, {
+  foreignKey: "id_carrera",
+  as: "estudiantesCarrera",
+});
+
+InscripcionMateria.belongsTo(EstudianteCarrera, {
+  foreignKey: "id_estudiante_carrera",
+  as: "estudiantesCarrera",
+});
+InscripcionMateria.belongsTo(MateriaCarrera, {
+  foreignKey: "id_materia_carrera",
+  as: "materiaCarrera",
+});
+InscripcionMateria.belongsTo(Ambiente, {
+  foreignKey: "id_ambiente",
+  as: "ambiente",
+});
+
+EstudianteCarrera.hasMany(InscripcionMateria, {
+  foreignKey: "id_estudiante_carrera",
+  as: "inscripciones",
+});
+MateriaCarrera.hasMany(InscripcionMateria, {
+  foreignKey: "id_materia_carrera",
+  as: "inscripciones",
+});
+Ambiente.hasMany(InscripcionMateria, {
+  foreignKey: "id_ambiente",
+  as: "inscripciones",
+});
 
 // Asociación de Docente y Materia (Uno a Muchos)
 Docente.hasMany(HorarioMateria, {
@@ -343,4 +388,9 @@ module.exports = {
   Materia,
   HorarioMateria,
   EstudianteHorarioMateria,
+  Carrera,
+  MateriaCarrera,
+  Ambiente,
+  EstudianteCarrera,
+  InscripcionMateria,
 };

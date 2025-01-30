@@ -1,4 +1,4 @@
-const { Producto, Trabajador } = require("../models");
+const { Producto, Trabajador, Rol } = require("../models");
 const MovimientoInventario = require("../models/MovimientoInventario");
 
 class servicesMovimientoInventario {
@@ -18,6 +18,12 @@ class servicesMovimientoInventario {
           {
             model: Trabajador,
             as: "trabajadorMovimientoInventario",
+            include: [
+              {
+                model: Rol,
+                as: "rol",
+              },
+            ],
           },
         ],
       });
