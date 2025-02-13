@@ -15,6 +15,17 @@ route.get("/", async (req, res) => {
   }
 });
 
+// Ruta GET para obtener todas las ventas
+route.get("/hoy", async (req, res) => {
+  try {
+    const ventas = await ventaService.getVentasDelDia();
+    res.json(ventas);
+  } catch (error) {
+    console.error("Error fetching ventas del dia:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 // Ruta GET para obtener una venta por id_venta
 route.get("/:id_venta", async (req, res) => {
   try {
@@ -52,6 +63,19 @@ route.post("/movimiento-inventario", async (req, res) => {
     res.status(201).json(resultado);
   } catch (error) {
     console.error("Error procesando venta:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+route.post("/anular-venta", async (req, res) => {
+  try {
+    const ventaDetalles = req.body;
+
+    const resultado = await ventaService.anularVenta(ventaDetalles);
+
+    res.status(201).json(resultado);
+  } catch (error) {
+    console.error("Error anular venta:", error);
     res.status(500).json({ error: error.message });
   }
 });

@@ -24,6 +24,11 @@ const routesEstudiantes = require("./routesEstudiantes");
 const routesDocentes = require("./routesDocentes");
 const routesHorarios = require("./routesHorarios");
 const routesMaterias = require("./routesMaterias");
+const routesCarrera = require("./routesCarrera");
+const routesAmbiente = require("./routesAmbiente");
+const routesEstudianteCarrera = require("./routesEstudianteCarrera");
+const routesInscripcionMateria = require("./routesInscripcionMateria");
+const routesMateriaCarrera = require("./routesMateriaCarrera");
 
 function router(app) {
   const routes = express.Router();
@@ -53,6 +58,11 @@ function router(app) {
   routes.use("/materias", routesMaterias);
   routes.use("/estudiantes", routesEstudiantes);
   routes.use("/docentes", routesDocentes);
+  routes.use("/carrera", routesCarrera);
+  routes.use("/ambiente", routesAmbiente);
+  routes.use("/materiaCarrera", routesMateriaCarrera);
+  routes.use("/estudianteCarrera", routesEstudianteCarrera);
+  routes.use("/inscripcionMateria", routesInscripcionMateria);
 }
 
 module.exports = router;

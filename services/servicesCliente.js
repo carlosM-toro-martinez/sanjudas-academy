@@ -8,10 +8,14 @@ class servicesCliente {
   // Método GET para obtener todos los clientes
   async getAllClientes() {
     try {
-      const clientes = await Cliente.findAll();
+      const clientes = await Cliente.findAll({
+        where: {
+          estado: true,
+        },
+      });
       return clientes;
     } catch (error) {
-      console.error("Error fetching all clientes:", error);
+      console.error("Error fetching all active clientes:", error);
       throw error;
     }
   }

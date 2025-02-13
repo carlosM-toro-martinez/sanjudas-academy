@@ -9,8 +9,26 @@ Ambiente.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    nombre: { type: DataTypes.STRING, unique: true },
+    nombre: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
+    capacidad: {
+      type: DataTypes.INTEGER,
+    },
+    ubicacion: {
+      type: DataTypes.STRING,
+    },
+    descripcion: {
+      type: DataTypes.STRING,
+    },
   },
-  { sequelize, modelName: "Ambiente", tableName: "Ambiente", timestamps: false }
+  {
+    sequelize,
+    modelName: "Ambiente",
+    tableName: "Ambiente",
+    timestamps: false,
+  }
 );
+
 module.exports = Ambiente;

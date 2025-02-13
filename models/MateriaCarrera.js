@@ -15,6 +15,11 @@ MateriaCarrera.init(
       type: DataTypes.INTEGER,
       references: { model: Carrera, key: "id_carrera" },
     },
+    semestre: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    sigla: { type: DataTypes.STRING, unique: true },
   },
   {
     sequelize,

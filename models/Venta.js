@@ -38,6 +38,11 @@ Venta.init(
     descuento_fidelidad_aplicado: {
       type: DataTypes.DECIMAL(5, 2),
     },
+    metodo_pago: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      defaultValue: "Contado",
+    },
   },
   {
     sequelize,

@@ -1,7 +1,10 @@
+const { Sequelize } = require("sequelize");
+const { Inventario, MovimientoInventario } = require("../models");
 const DetalleCompra = require("../models/DetalleCompra");
 const Lote = require("../models/Lote");
 const Producto = require("../models/Producto");
 const Proveedor = require("../models/Proveedor");
+const sequelize = require("../libs/dbConexionORM");
 
 class servicesDetalleCompra {
   constructor() {
@@ -39,7 +42,11 @@ class servicesDetalleCompra {
                 attributes: ["nombre", "id_proveedor"],
               },
             ],
-            attributes: ["precio_unitario"],
+            attributes: ["precio_unitario", "id_detalle"],
+          },
+          {
+            model: Inventario,
+            as: "inventarios",
           },
         ],
         attributes: [
@@ -101,17 +108,140 @@ class servicesDetalleCompra {
     }
   }
 
-  async deleteDetalleCompra(id_detalle) {
+  // async deleteDetalleCompra(id_detalle) {
+  //   try {
+  //     const detalleCompra = await DetalleCompra.findByPk(id_detalle);
+  //     if (!detalleCompra) {
+  //       throw new Error(`DetalleCompra with ID ${id_detalle} not found`);
+  //     }
+  //     await detalleCompra.destroy();
+  //     return { message: "DetalleCompra deleted successfully" };
+  //   } catch (error) {
+  //     console.error("Error deleting detalle de compra:", error);
+  //     throw error;
+  //   }
+  // }
+
+  async eliminarInventarioYActualizarProducto(detalle) {
+    const transaction = await sequelize.transaction();
+  
     try {
-      const detalleCompra = await DetalleCompra.findByPk(id_detalle);
-      if (!detalleCompra) {
-        throw new Error(`DetalleCompra with ID ${id_detalle} not found`);
+      const {
+        id_producto,
+        id_lote,
+        id_inventario,
+        id_movimiento,
+        id_detalle,
+        cantidad,
+        subCantidad,
+        peso,
+      } = detalle;
+  
+      const productoModificaciones = {};
+  
+      try {
+        // Eliminar inventario
+        const inventario = await Inventario.findByPk(id_inventario, {
+          transaction,
+        });
+  
+        if (inventario) {
+          await inventario.destroy({ transaction });
+        } else {
+          console.warn(`No se encontró el inventario con ID ${id_inventario}.`);
+        }
+  
+        // Eliminar movimiento de inventario
+        const movimiento = await MovimientoInventario.findByPk(id_movimiento, {
+          transaction,
+        });
+  
+        if (movimiento) {
+          await movimiento.destroy({ transaction });
+        } else {
+          console.warn(
+            `No se encontró el MovimientoInventario con ID ${id_movimiento}.`
+          );
+        }
+  
+        // Eliminar lote
+        const lote = await Lote.findByPk(id_lote, {
+          transaction,
+        });
+  
+        if (lote) {
+          await lote.destroy({ transaction });
+        } else {
+          console.warn(`No se encontró el lote con ID ${id_lote}.`);
+        }
+  
+        // Eliminar detalle de compra
+        const detalleCompra = await DetalleCompra.findByPk(id_detalle, {
+          transaction,
+        });
+  
+        if (detalleCompra) {
+          await detalleCompra.destroy({ transaction });
+        } else {
+          console.warn(`No se encontró el DetalleCompra con ID ${id_detalle}.`);
+        }
+  
+        // Actualizar producto
+        if (!productoModificaciones[id_producto]) {
+          const producto = await Producto.findByPk(id_producto, {
+            transaction,
+          });
+  
+          if (producto) {
+            productoModificaciones[id_producto] = {
+              producto,
+              stock: producto.stock,
+              subCantidad: producto.subCantidad,
+              peso: producto.peso,
+            };
+          } else {
+            console.warn(`Producto no encontrado (ID Producto: ${id_producto}).`);
+          }
+        }
+  
+        if (productoModificaciones[id_producto]) {
+          productoModificaciones[id_producto].stock -= cantidad || 0;
+          productoModificaciones[id_producto].subCantidad -= subCantidad || 0;
+          productoModificaciones[id_producto].peso -= parseFloat(peso) || 0;
+        }
+      } catch (error) {
+        console.error(`Error al procesar el detalle: ${error.message}`);
       }
-      await detalleCompra.destroy();
-      return { message: "DetalleCompra deleted successfully" };
+  
+      // Guardar actualizaciones del producto
+      for (const mod of Object.values(productoModificaciones)) {
+        try {
+          await mod.producto.update(
+            {
+              stock: mod.stock,
+              subCantidad: mod.subCantidad,
+              peso: mod.peso,
+            },
+            { transaction }
+          );
+        } catch (error) {
+          console.error(
+            `Error al actualizar el producto con ID ${mod.producto.id}: ${error.message}`
+          );
+        }
+      }
+  
+      // Confirmar transacción
+      await transaction.commit();
+  
+      return {
+        message: "El inventario y los registros relacionados fueron eliminados exitosamente.",
+      };
     } catch (error) {
-      console.error("Error deleting detalle de compra:", error);
-      throw error;
+      // Revertir transacción en caso de error
+      await transaction.rollback();
+      console.error(`Error general: ${error.message}`);
+      throw new Error("Ocurrió un error al eliminar el inventario.");
     }
   }
 }

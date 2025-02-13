@@ -32,9 +32,11 @@ Lote.init(
     cantidad: {
       type: DataTypes.INTEGER,
     },
+
     cantidadPorCaja: {
       type: DataTypes.INTEGER,
     },
+
     subCantidad: DataTypes.INTEGER,
     peso: DataTypes.DECIMAL(10, 2),
     id_detalle_compra: {

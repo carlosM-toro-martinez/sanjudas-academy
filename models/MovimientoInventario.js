@@ -19,12 +19,6 @@ MovimientoInventario.init(
         key: "id_producto",
       },
     },
-    cantidad: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-
-    subCantidad: DataTypes.INTEGER,
     fecha_movimiento: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -33,6 +27,13 @@ MovimientoInventario.init(
       type: DataTypes.STRING(50),
       allowNull: false,
     },
+
+    cantidad: {
+      type: DataTypes.INTEGER,
+    },
+
+    subCantidad: DataTypes.INTEGER,
+    peso: DataTypes.DECIMAL(10, 2),
     id_trabajador: {
       type: DataTypes.INTEGER,
       references: {
