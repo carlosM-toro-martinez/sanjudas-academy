@@ -42,7 +42,7 @@ async function createInitialData() {
   ];
 
   for (const permiso of permisos) {
-    await Permiso.findOrCreate({
+    await Permiso?.findOrCreate({
       where: { nombre: permiso.nombre },
     });
   }
@@ -50,7 +50,7 @@ async function createInitialData() {
   const categorias = [{ nombre: "Material de escritorio" }];
 
   for (const categoria of categorias) {
-    await db.Categoria.findOrCreate({
+    await db.Categoria?.findOrCreate({
       where: { nombre: categoria.nombre },
     });
   }

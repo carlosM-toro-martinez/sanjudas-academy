@@ -21,6 +21,7 @@ const DenominacionCaja = require("./DenominacionCaja");
 const Reporte = require("./Reporte");
 const Categoria = require("./Categoria");
 const MetodoVenta = require("./MetodoVenta");
+const Garantia = require("./Garantia");
 const Estudiante = require("./Estudiante");
 const Horario = require("./Horario");
 const Docente = require("./Docente");
@@ -153,6 +154,38 @@ HorarioMateria.belongsToMany(Estudiante, {
   foreignKey: "id_horario_materia",
   otherKey: "id_estudiante",
   as: "estudiantes",
+});
+
+// Asociación DetalleVenta -> Lote
+DetalleVenta.belongsTo(Lote, {
+  foreignKey: "id_lote",
+  as: "lote",
+});
+
+// Asociación Lote -> DetalleVenta
+Lote.hasMany(DetalleVenta, {
+  foreignKey: "id_lote",
+  as: "detallesVenta",
+});
+
+// Relación Garantia con Cliente
+Cliente.hasMany(Garantia, {
+  foreignKey: "id_cliente",
+  as: "garantias",
+});
+Garantia.belongsTo(Cliente, {
+  foreignKey: "id_cliente",
+  as: "cliente",
+});
+
+// Relación Garantia con Venta
+Venta.hasMany(Garantia, {
+  foreignKey: "id_venta",
+  as: "garantias",
+});
+Garantia.belongsTo(Venta, {
+  foreignKey: "id_venta",
+  as: "venta",
 });
 
 // Asociación de Producto y MetodoVenta (Uno a Muchos)
@@ -393,4 +426,5 @@ module.exports = {
   Ambiente,
   EstudianteCarrera,
   InscripcionMateria,
+  Garantia,
 };

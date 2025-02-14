@@ -12,6 +12,8 @@ const {
   Cliente,
   DetalleVenta,
   Caja,
+  EstudianteCarrera,
+  Carrera,
 } = require("../models");
 
 class servicesReporte {
@@ -219,36 +221,62 @@ class servicesReporte {
     }
   }
 
+  async getEstudiantes(idInicio, idFin) {
+    try {
+      const estudiantes = await EstudianteCarrera.findAll({
+        where: {
+          id_estudiante_carrera: {
+            [Op.between]: [idInicio, idFin],
+          },
+        },
+        include: [
+          {
+            model: Carrera,
+            as: "carrera",
+          },
+        ],
+      });
+      return estudiantes;
+    } catch (error) {
+      console.error("Error fetching Estudiantes:", error);
+      throw error;
+    }
+  }
+
   async getVentasClientes() {
     try {
       const ventas = await Venta.findAll({
         attributes: [
-          'id_cliente',
-          [Sequelize.fn('SUM', Sequelize.col('total')), 'total_gastado'],
-          [Sequelize.col('cliente.id_cliente'), 'cliente.id_cliente'],
-          [Sequelize.col('cliente.nombre'), 'cliente.nombre'],
-          [Sequelize.col('cliente.apellido'), 'cliente.apellido']
+          "id_cliente",
+          [Sequelize.fn("SUM", Sequelize.col("total")), "total_gastado"],
+          [Sequelize.col("cliente.id_cliente"), "cliente.id_cliente"],
+          [Sequelize.col("cliente.nombre"), "cliente.nombre"],
+          [Sequelize.col("cliente.apellido"), "cliente.apellido"],
         ],
         include: [
           {
             model: Cliente,
-            as: 'cliente',
-            attributes: ['id_cliente', 'nombre', 'apellido', 'puntos_fidelidad', 'codigo' ],
-
-          }
+            as: "cliente",
+            attributes: [
+              "id_cliente",
+              "nombre",
+              "apellido",
+              "puntos_fidelidad",
+              "codigo",
+            ],
+          },
         ],
         group: [
-          'Venta.id_cliente',
-          'cliente.id_cliente',
-          'cliente.nombre',
-          'cliente.apellido',
-          'cliente.puntos_fidelidad',
-          'cliente.codigo',
-
+          "Venta.id_cliente",
+          "cliente.id_cliente",
+          "cliente.nombre",
+          "cliente.apellido",
+          "cliente.puntos_fidelidad",
+          "cliente.codigo",
         ],
-        order: [[Sequelize.literal('total_gastado'), 'DESC']]
+        order: [[Sequelize.literal("total_gastado"), "DESC"]],
       });
-  
+
       return ventas.map((venta) => ({
         id_cliente: venta.id_cliente,
         nombre: venta.cliente.nombre,
@@ -267,16 +295,14 @@ class servicesReporte {
     try {
       const clientes = await Cliente.findAll({
         attributes: [
-          'id_cliente',
-          'nombre',
-          'apellido',
-          'puntos_fidelidad',
-          'codigo'
+          "id_cliente",
+          "nombre",
+          "apellido",
+          "puntos_fidelidad",
+          "codigo",
         ],
-        order: [
-          ['puntos_fidelidad', 'DESC']
-        ],
-        limit: 10
+        order: [["puntos_fidelidad", "DESC"]],
+        limit: 10,
       });
 
       return clientes.map((cliente) => ({
@@ -284,10 +310,13 @@ class servicesReporte {
         nombre: cliente.nombre,
         apellido: cliente.apellido,
         puntos_fidelidad: cliente.puntos_fidelidad,
-        codigo: cliente.codigo
+        codigo: cliente.codigo,
       }));
     } catch (error) {
-      console.error("Error fetching top clientes por puntos de fidelidad:", error);
+      console.error(
+        "Error fetching top clientes por puntos de fidelidad:",
+        error
+      );
       throw error;
     }
   }
@@ -375,17 +404,12 @@ class servicesReporte {
           {
             model: Cliente,
             as: "cliente",
-            attributes: [
-              "id_cliente",
-              "codigo",
-              "nombre",
-              "apellido"
-            ]
-          }
+            attributes: ["id_cliente", "codigo", "nombre", "apellido"],
+          },
         ],
         group: ["cliente.id_cliente"], // Agrupar por Cliente.id_cliente usando el alias 'cliente'
       });
-  
+
       return totalGastado ? totalGastado.get() : null; // Retornar el total gastado si existe
     } catch (error) {
       console.error("Error fetching total gastado for cliente:", error);
