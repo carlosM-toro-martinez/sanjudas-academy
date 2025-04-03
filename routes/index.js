@@ -29,6 +29,7 @@ const routesAmbiente = require("./routesAmbiente");
 const routesEstudianteCarrera = require("./routesEstudianteCarrera");
 const routesInscripcionMateria = require("./routesInscripcionMateria");
 const routesMateriaCarrera = require("./routesMateriaCarrera");
+const routesPagoMensualidad = require("./routesPagoMensualidad");
 
 function router(app) {
   const routes = express.Router();
@@ -63,6 +64,7 @@ function router(app) {
   routes.use("/materiaCarrera", routesMateriaCarrera);
   routes.use("/estudianteCarrera", routesEstudianteCarrera);
   routes.use("/inscripcionMateria", routesInscripcionMateria);
+  routes.use("/pagoMensualidad", routesPagoMensualidad);
 }
 
 module.exports = router;

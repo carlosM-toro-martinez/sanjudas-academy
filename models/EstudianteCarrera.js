@@ -36,6 +36,11 @@ EstudianteCarrera.init(
     fecha_inscripcion: DataTypes.DATE,
     ru: DataTypes.STRING,
     password: DataTypes.STRING,
+    estado: {
+      type: DataTypes.STRING,
+      defaultValue: "activo",
+      allowNull: false,
+    },
   },
   {
     sequelize,
@@ -44,4 +49,5 @@ EstudianteCarrera.init(
     timestamps: false,
   }
 );
+
 module.exports = EstudianteCarrera;

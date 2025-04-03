@@ -33,6 +33,19 @@ const MateriaCarrera = require("./MateriaCarrera");
 const Ambiente = require("./Ambiente");
 const EstudianteCarrera = require("./EstudianteCarrera");
 const InscripcionMateria = require("./InscripcionMateria");
+const PagoMensualidad = require("./PagoMensualidad");
+
+EstudianteCarrera.hasMany(PagoMensualidad, {
+  foreignKey: "id_estudiante_carrera",
+  sourceKey: "id_estudiante_carrera",
+  as: "estudianteMensualidad",
+});
+PagoMensualidad.belongsTo(EstudianteCarrera, {
+  foreignKey: "id_estudiante_carrera",
+  targetKey: "id_estudiante_carrera",
+  as: "estudianteMensualidad",
+});
+
 // // Definir las relaciones
 // Estudiante.hasMany(EstudianteHorarioMateria, {
 //   foreignKey: "id_estudiante",
