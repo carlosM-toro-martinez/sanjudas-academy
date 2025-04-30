@@ -1,9 +1,9 @@
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../libs/dbConexionORM");
 
-class PagoMensualidad extends Model {}
+class PagoMatricula extends Model {}
 
-PagoMensualidad.init(
+PagoMatricula.init(
   {
     id_pago: {
       type: DataTypes.INTEGER,
@@ -24,7 +24,7 @@ PagoMensualidad.init(
     },
     observacion: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     fecha_pago: {
       type: DataTypes.DATE,
@@ -47,10 +47,10 @@ PagoMensualidad.init(
   },
   {
     sequelize,
-    modelName: "PagoMensualidad",
-    tableName: "PagoMensualidad",
+    modelName: "PagoMatricula",
+    tableName: "PagoMatricula",
     timestamps: false,
   }
 );
 
-module.exports = PagoMensualidad;
+module.exports = PagoMatricula;

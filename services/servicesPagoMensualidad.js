@@ -1,5 +1,6 @@
 const { EstudianteCarrera } = require("../models");
 const PagoMensualidad = require("../models/PagoMensualidad");
+const { fn, col } = require("sequelize");
 
 class ServicesPagoMensualidad {
   constructor() {
@@ -9,7 +10,14 @@ class ServicesPagoMensualidad {
   async getAllPagos() {
     try {
       const pagos = await EstudianteCarrera.findAll({
-        attributes: ["id_estudiante_carrera", "nombre", "correo", "ru"],
+        attributes: [
+          "id_estudiante_carrera",
+          "nombre",
+          "apellido_paterno",
+          "apellido_materno",
+          "correo",
+          "ru",
+        ],
         include: [
           {
             model: PagoMensualidad,
@@ -20,6 +28,65 @@ class ServicesPagoMensualidad {
       return pagos;
     } catch (error) {
       console.error("Error fetching all pagos:", error);
+      throw error;
+    }
+  }
+
+  async getEstudiantesConPagoPorModulo(moduloBusqueda) {
+    try {
+      const estudiantes = await EstudianteCarrera.findAll({
+        attributes: [
+          "id_estudiante_carrera",
+          "nombre",
+          "apellido_paterno",
+          "apellido_materno",
+          "ru",
+        ],
+        include: [
+          {
+            model: PagoMensualidad,
+            as: "estudianteMensualidad",
+            where: { modulo: moduloBusqueda },
+            required: true,
+          },
+        ],
+      });
+
+      const resultado = estudiantes.map((e) => {
+        const montoPagado = e.estudianteMensualidad.reduce(
+          (sum, pago) => sum + parseFloat(pago.monto),
+          0
+        );
+        return {
+          nombreCompleto: `${e.nombre} ${e.apellido_paterno} ${e.apellido_materno}`,
+          ru: e.ru,
+          montoPagado,
+          fecha_pago: e.estudianteMensualidad[0].fecha_pago,
+        };
+      });
+      console.log(resultado);
+
+      return resultado;
+    } catch (error) {
+      console.error(
+        `Error fetching estudiantes con pago módulo=${moduloBusqueda}:`,
+        error
+      );
+      throw error;
+    }
+  }
+
+  async getModulos() {
+    try {
+      const modulos = await PagoMensualidad.findAll({
+        attributes: [[fn("DISTINCT", col("modulo")), "modulo"]],
+        raw: true,
+      });
+
+      const listaModulos = modulos.map((m) => m.modulo);
+      return listaModulos;
+    } catch (error) {
+      console.error("Error fetching módulos:", error);
       throw error;
     }
   }

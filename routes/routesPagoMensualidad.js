@@ -14,6 +14,27 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/modules", async (req, res) => {
+  try {
+    const pagos = await pagoService.getModulos();
+    res.json(pagos);
+  } catch (error) {
+    console.error("Error fetching pagos:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.get("/estudiantePagoModulo/:modulo", async (req, res) => {
+  try {
+    const { modulo } = req.params;
+    const pagos = await pagoService.getEstudiantesConPagoPorModulo(modulo);
+    res.json(pagos);
+  } catch (error) {
+    console.error("Error fetching pagos:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 // Ruta GET para obtener un pago por ID
 router.get("/:id", async (req, res) => {
   try {
