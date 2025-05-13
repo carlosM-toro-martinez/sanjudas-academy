@@ -1,6 +1,8 @@
+const sequelize = require("../libs/dbConexionORM");
 const { EstudianteCarrera } = require("../models");
 const PagoMensualidad = require("../models/PagoMensualidad");
 const { fn, col } = require("sequelize");
+const PagoParcial = require("../models/PagoParcial");
 
 class ServicesPagoMensualidad {
   constructor() {
@@ -22,6 +24,18 @@ class ServicesPagoMensualidad {
           {
             model: PagoMensualidad,
             as: "estudianteMensualidad",
+            include: [
+              {
+                model: PagoParcial,
+                as: "pagos_parciales",
+                attributes: [
+                  "id_pago_parcial",
+                  "monto",
+                  "fecha_pago",
+                  "observacion",
+                ],
+              },
+            ],
           },
         ],
       });
@@ -105,13 +119,81 @@ class ServicesPagoMensualidad {
   }
 
   async createPago(data) {
-    try {
-      const newPago = await PagoMensualidad.create(data);
-      return newPago;
-    } catch (error) {
-      console.error("Error creating pago:", error);
-      throw error;
-    }
+    return await sequelize.transaction(async (t) => {
+      const year = new Date(data.fecha_pago).getFullYear();
+
+      const [pagoMensualidad] = await PagoMensualidad.findOrCreate({
+        where: {
+          id_estudiante_carrera: data.id_estudiante_carrera,
+          modulo: data.modulo,
+          year,
+        },
+        defaults: {
+          ...data,
+          monto: 0,
+          monto_total: 0,
+          year,
+        },
+        transaction: t,
+      });
+
+      const nuevoMontoTotal =
+        parseFloat(pagoMensualidad.monto_total) + parseFloat(data.monto);
+
+      pagoMensualidad.monto_total = nuevoMontoTotal;
+      pagoMensualidad.monto = nuevoMontoTotal;
+      pagoMensualidad.fecha_pago = data.fecha_pago;
+      pagoMensualidad.observacion = data.observacion || null;
+      await pagoMensualidad.save({ transaction: t });
+
+      await PagoParcial.create(
+        {
+          id_pago: pagoMensualidad.id_pago,
+          monto: data.monto,
+          fecha_pago: data.fecha_pago,
+          observacion: data.observacion || null,
+        },
+        { transaction: t }
+      );
+
+      return pagoMensualidad;
+    });
+  }
+
+  async createPagoParcial(data) {
+    return await sequelize.transaction(async (t) => {
+      // 1. Crear el pago parcial
+      const nuevoParcial = await PagoParcial.create(
+        {
+          id_pago: data.id_pago,
+          monto: data.monto,
+          fecha_pago: data.fecha_pago,
+          observacion: data.observacion || null,
+        },
+        { transaction: t }
+      );
+
+      // 2. Obtener la mensualidad y acumular el monto
+      const mensualidad = await PagoMensualidad.findByPk(data.id_pago, {
+        transaction: t,
+      });
+      if (!mensualidad) {
+        throw new Error(
+          `No se encontró PagoMensualidad con id ${data.id_pago}`
+        );
+      }
+
+      const montoActual = parseFloat(mensualidad.monto_total);
+      const nuevoMonto = parseFloat(data.monto);
+      mensualidad.monto_total = montoActual + nuevoMonto;
+      // Opcional: actualizar también `monto` (último) y `fecha_pago`
+      mensualidad.monto = parseFloat(mensualidad.monto) + nuevoMonto;
+      mensualidad.fecha_pago = data.fecha_pago;
+      await mensualidad.save({ transaction: t });
+
+      // 3. Devolver el registro creado
+      return nuevoParcial;
+    });
   }
 
   async updatePago(id, data) {

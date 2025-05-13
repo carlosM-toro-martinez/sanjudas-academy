@@ -58,6 +58,16 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.post("/pagoParcial", async (req, res) => {
+  try {
+    const newPago = await pagoService.createPagoParcial(req.body);
+    res.status(201).json(newPago);
+  } catch (error) {
+    console.error("Error creating pago:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 // Ruta PUT para actualizar un pago por ID
 router.put("/:id", async (req, res) => {
   try {

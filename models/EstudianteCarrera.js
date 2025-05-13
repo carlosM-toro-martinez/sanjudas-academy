@@ -1,4 +1,4 @@
-const { Model, DataTypes } = require("sequelize");
+const { Model, DataTypes, Sequelize } = require("sequelize");
 const sequelize = require("../libs/dbConexionORM");
 
 class EstudianteCarrera extends Model {}
@@ -34,7 +34,10 @@ EstudianteCarrera.init(
     numero_diploma: DataTypes.STRING,
     foto: DataTypes.STRING,
     fecha_inscripcion: DataTypes.DATE,
-    ru: DataTypes.STRING,
+    ru: {
+      type: DataTypes.INTEGER,
+      defaultValue: Sequelize.literal("nextval('estudiante_ru_seq')"),
+    },
     password: DataTypes.STRING,
     estado: {
       type: DataTypes.STRING,

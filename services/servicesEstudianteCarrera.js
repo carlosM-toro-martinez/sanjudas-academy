@@ -1,3 +1,4 @@
+const { Carrera } = require("../models");
 const EstudianteCarrera = require("../models/EstudianteCarrera");
 
 class servicesEstudianteCarrera {
@@ -7,7 +8,12 @@ class servicesEstudianteCarrera {
 
   async getAllEstudiantesCarrera() {
     try {
-      const estudiantes = await EstudianteCarrera.findAll();
+      const estudiantes = await EstudianteCarrera.findAll({
+        include: {
+          model: Carrera,
+          as: "carrera",
+        },
+      });
       return estudiantes;
     } catch (error) {
       console.error("Error fetching all estudiantes carrera:", error);

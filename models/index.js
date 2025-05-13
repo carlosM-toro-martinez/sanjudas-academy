@@ -34,6 +34,7 @@ const Ambiente = require("./Ambiente");
 const EstudianteCarrera = require("./EstudianteCarrera");
 const InscripcionMateria = require("./InscripcionMateria");
 const PagoMensualidad = require("./PagoMensualidad");
+const PagoParcial = require("./PagoParcial");
 
 EstudianteCarrera.hasMany(PagoMensualidad, {
   foreignKey: "id_estudiante_carrera",
@@ -44,6 +45,16 @@ PagoMensualidad.belongsTo(EstudianteCarrera, {
   foreignKey: "id_estudiante_carrera",
   targetKey: "id_estudiante_carrera",
   as: "estudianteMensualidad",
+});
+
+PagoMensualidad.hasMany(PagoParcial, {
+  foreignKey: "id_pago",
+  as: "pagos_parciales",
+});
+
+PagoParcial.belongsTo(PagoMensualidad, {
+  foreignKey: "id_pago",
+  as: "mensualidad",
 });
 
 // // Definir las relaciones
@@ -440,4 +451,5 @@ module.exports = {
   EstudianteCarrera,
   InscripcionMateria,
   Garantia,
+  PagoParcial,
 };
